@@ -18,7 +18,7 @@ typedef struct polynome{
 	Polynome ChangerSigne(Polynome );
 	int comparer(Polynome ,Polynome );
 	Polynome derivee(Polynome );
-	void courbe(Polynome,int,int,int);
+	void courbe(Polynome,Polynome );
 	Polynome A, B,D1,D2;
 	int tabCourbe[10][10];
 
@@ -30,6 +30,7 @@ typedef struct polynome{
         	double resultPoly;  
 			Polynome p=saisir();
         	Polynome q=saisir();
+        	Polynome pn,qn;
         	printf("\n----------------la 1ere polynome ----------------:");
         	affiche(p);
         	printf("\n\n----------------la 2eme polynome ----------------:");
@@ -67,15 +68,14 @@ typedef struct polynome{
         printf("\nValeur de la 2eme polynome pour x = %d : %.5f\n", x, resultPoly);
         
         printf("\n----------------Apres le changement de signe de la 1ere polynome:----------------\n");
-        p=ChangerSigne(p);
+        pn=ChangerSigne(p);
         affiche(p);
         printf("\n----------------Apres le changement de signe de la 2eme polynome:----------------\n");
-        q=ChangerSigne(q);
+        qn=ChangerSigne(q);
         affiche(q);
-        printf("\n\n----------------La courbe du 1er polynome :----------------\n");
-        courbe(p,1,2,3);
-         printf("\n\n----------------La courbe du 2eme polynome :----------------\n");
-        courbe(q,1,2,3);
+        printf("\n\n----------------La courbe du 1er et le 2eme polynome :----------------\n");
+        courbe(p,q);
+         
 		
 		}
 	
@@ -209,8 +209,8 @@ Polynome derivee(Polynome p){
 return D;
 }
 //fct de trace de la courbe d'un polynome
-void courbe(Polynome p,int x, int y, int z){
-	double xx,yy,zz;
+void courbe(Polynome p,Polynome q){
+/*	double xx,yy,zz;
 	xx =eval_iterative(p,x,xx);
 	yy =eval_iterative(p,x,yy);
 	zz =eval_iterative(p,x,zz);
@@ -230,5 +230,31 @@ void courbe(Polynome p,int x, int y, int z){
 		}
 		printf("\n");
 	}
+	*/
+	FILE *fPtr= fopen("courbe.dat","w");
+	double points1[100];
+	double points2[100];
+	double points3[100];
+	
+	for(int i=0;i<100;i++){
+		points1[i]=eval_iterative(p,i,points1[i]);
+		fprintf(fPtr,"%d	%lf\n",i,points1[i]);
+	}
+	for(int i=0;i<100;i++){
+		points2[i]=eval_iterative(q,i,points2[i]);
+		fprintf(fPtr,"%d	%lf\n",i,points2[i]);
+	}
+	for(int i=0;i<100;i++){
+		points3[i]=eval_iterative(A,i,points3[i]);
+		fprintf(fPtr,"%d	%lf\n",i,points3[i]);
+	}
+	
+	fPtr =popen("gnuplot -persist ","w");
+	if(fPtr!= NULL)
+	fprintf(fPtr,"plot 'courbe.dat'\n");
+	system("plot \'courbe.dat\'");
+	fclose(fPtr);
+	
 	
 }
+
